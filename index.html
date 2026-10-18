@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0F3D2E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Saeedi Essence">
+<title>Saeedi Essence Orders</title>
+<script src="./vendor/jspdf.umd.min.js"></script>
+<style>
+@font-face {
+  font-family: "Figtree";
+  src: url("./fonts/figtree-latin-wght-normal.woff2") format("woff2-variations");
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Bricolage Grotesque";
+  src: url("./fonts/bricolage-grotesque-latin-wght-normal.woff2") format("woff2-variations");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+:root {
+  box-sizing: border-box;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  --bg: #EDF2EC; --panel: #FFFFFF; --field: #F1F5F0; --ink: #10261C; --muted: #5B6F63; --line: #D6E0D8;
+  --hero: #0F3D2E; --accent: #F2B01E; --accent-ink: #10261C; --ring: #1E7A55;
+  --shadow: 0 1px 2px rgba(16,38,28,.06), 0 8px 20px rgba(16,38,28,.05);
+  --c0: #D98E04; --c1: #C8331F; --c2: #1E7A55; --c3: #3B5BA5; --c4: #7A3B69; --c5: #1F8A8A; --c6: #A0621A; --c7: #6B7A1F;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0B1510; --panel: #13241C; --field: #0E1C15; --ink: #E9F2EB; --muted: #94AB9C; --line: #24392E;
+    --hero: #123A2B; --accent: #F2B01E; --accent-ink: #10261C; --ring: #F2B01E; --shadow: none;
+    --c0: #F2B01E; --c1: #F0705A; --c2: #4CC58E; --c3: #7B9BE0; --c4: #C57FB1; --c5: #4CC2C2; --c6: #D9924A; --c7: #A9BC4A;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0B1510; --panel: #13241C; --field: #0E1C15; --ink: #E9F2EB; --muted: #94AB9C; --line: #24392E;
+  --hero: #123A2B; --accent: #F2B01E; --accent-ink: #10261C; --ring: #F2B01E; --shadow: none;
+  --c0: #F2B01E; --c1: #F0705A; --c2: #4CC58E; --c3: #7B9BE0; --c4: #C57FB1; --c5: #4CC2C2; --c6: #D9924A; --c7: #A9BC4A;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.45; }
+h1, h2 { font-family: "Bricolage Grotesque", "Figtree", system-ui, sans-serif; }
+.wrap { max-width: 640px; margin: 0 auto; padding: 18px 16px 108px; }
+
+.hero { background: var(--hero); color: #fff; padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px 22px; border-radius: 0 0 26px 26px; border-bottom: 5px solid var(--accent); }
+.hero-in { max-width: 640px; margin: 0 auto; }
+.head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.title-input { width: 100%; border: 0; background: transparent; color: #fff; font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 700; font-size: 34px; line-height: 1.12; padding: 4px 0; letter-spacing: -0.01em; border-bottom: 2px solid transparent; border-radius: 0; }
+.title-input:focus { outline: none; border-bottom-color: var(--accent); }
+.theme-btn { flex: none; margin-top: 4px; background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.25); color: #fff; }
+.orderfor { margin: 0; }
+.orderfor label { color: rgba(255,255,255,.75); }
+.orderfor input { height: 52px; font-size: 18px; font-weight: 600; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.28); color: #fff; }
+.orderfor input::placeholder { color: rgba(255,255,255,.55); font-weight: 400; }
+.orderfor input:focus-visible { outline-color: var(--accent); }
+.sub { color: var(--muted); font-size: 14px; margin: 0 0 14px; }
+
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--ring); outline-offset: 2px; }
+.icon-btn { width: 42px; height: 42px; border-radius: 13px; border: 1px solid var(--line); background: var(--panel); display: grid; place-items: center; font-size: 18px; }
+
+.add { background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 16px; box-shadow: var(--shadow); }
+.stack { display: flex; flex-direction: column; gap: 10px; }
+.field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.field label { font-size: 13px; color: var(--muted); font-weight: 500; }
+.pair { display: flex; gap: 8px; }
+.pair input { flex: 1; min-width: 0; }
+.pair select { width: 112px; flex: none; }
+input[type=text], input[type=number], select { width: 100%; height: 48px; padding: 0 12px; font: inherit; color: var(--ink); background: var(--field); border: 1px solid var(--line); border-radius: 12px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips:empty { display: none; }
+.chip { border: 1px solid var(--line); background: var(--field); border-radius: 999px; padding: 5px 12px 5px 10px; font-size: 14px; display: inline-flex; align-items: center; gap: 6px; }
+.chip i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.chip[aria-pressed="true"] { border-color: var(--ink); background: var(--panel); font-weight: 600; }
+.primary { width: 100%; height: 54px; margin-top: 14px; border: 0; border-radius: 15px; background: var(--accent); color: var(--accent-ink); font-weight: 700; font-size: 17px; box-shadow: 0 2px 0 rgba(16,38,28,.18); }
+.primary:active { transform: translateY(1px); box-shadow: none; }
+
+.summary { display: flex; gap: 8px; align-items: baseline; justify-content: space-between; margin: 24px 2px 8px; flex-wrap: wrap; }
+.summary h2 { margin: 0; font-size: 21px; }
+.summary span { color: var(--muted); font-size: 14px; }
+.tools { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 12px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--panel); }
+.seg button { border: 0; background: transparent; padding: 9px 14px; font-size: 14px; font-weight: 500; }
+.seg button[aria-pressed="true"] { background: var(--hero); color: #fff; font-weight: 600; }
+.linkbtn { border: 0; background: none; color: var(--muted); font-size: 14px; text-decoration: underline; padding: 8px 4px; }
+
+.cat { background: var(--panel); border: 1px solid var(--line); border-radius: 20px; margin-bottom: 12px; overflow: hidden; box-shadow: var(--shadow); }
+.cat-head { display: flex; align-items: center; gap: 10px; padding: 13px 14px; border-bottom: 1px solid var(--line); border-left: 8px solid var(--cc); background: var(--panel); background: color-mix(in srgb, var(--cc) 11%, var(--panel)); }
+.cat-head h3 { margin: 0; font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 19px; font-weight: 700; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.cat-head small { color: var(--muted); font-size: 13px; text-align: right; }
+.item { display: flex; align-items: center; gap: 10px; padding: 11px 12px 11px 10px; border-bottom: 1px solid var(--line); border-left: 8px solid var(--cc); }
+.item:last-child { border-bottom: 0; }
+.no { flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--field); border: 1px solid var(--line); display: grid; place-items: center; font-size: 13px; font-weight: 600; color: var(--muted); }
+.info { flex: 1; min-width: 0; text-align: left; background: none; border: 0; padding: 2px 0; display: flex; flex-direction: column; gap: 3px; }
+.iname { font-size: 17px; font-weight: 500; overflow-wrap: anywhere; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; color: var(--muted); }
+.wchip { border: 1px solid var(--line); background: var(--field); border-radius: 999px; padding: 0 9px; }
+.stepper { flex: none; display: flex; align-items: center; gap: 2px; }
+.stepper button { width: 34px; height: 34px; border-radius: 10px; border: 1px solid var(--line); background: var(--field); font-size: 18px; line-height: 1; padding: 0; }
+.stepper .val { min-width: 52px; text-align: center; font-weight: 700; font-size: 16px; }
+.stepper .val small { display: block; color: var(--muted); font-weight: 400; font-size: 11px; line-height: 1; }
+.del { flex: none; width: 34px; height: 34px; border: 0; background: none; color: var(--muted); font-size: 20px; border-radius: 10px; padding: 0; }
+.totalbox { display: flex; justify-content: space-between; align-items: center; gap: 12px; background: var(--hero); color: #fff; border-radius: 20px; padding: 18px 20px; margin-bottom: 12px; border-bottom: 5px solid var(--accent); }
+.tl { font-size: 15px; font-weight: 500; opacity: .85; }
+.tv { font-family: "Bricolage Grotesque", "Figtree", system-ui, sans-serif; font-size: 26px; text-align: right; overflow-wrap: anywhere; color: var(--accent); }
+.empty { text-align: center; color: var(--muted); padding: 34px 18px; background: var(--panel); border: 1px dashed var(--line); border-radius: 20px; }
+.empty b { display: block; color: var(--ink); font-size: 18px; margin-bottom: 4px; font-family: "Bricolage Grotesque", system-ui, sans-serif; }
+
+.bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); background: var(--panel); border-top: 1px solid var(--line); }
+.bar-in { max-width: 640px; margin: 0 auto; display: flex; gap: 8px; }
+.bar button { flex: 1; height: 48px; border-radius: 13px; border: 1px solid var(--line); background: var(--field); font-weight: 600; font-size: 15px; padding: 0 6px; }
+.bar button.main { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); flex: 1.3; font-weight: 700; }
+
+dialog { width: min(92vw, 520px); max-height: 92vh; overflow: auto; border: 1px solid var(--line); border-radius: 20px; padding: 18px; background: var(--panel); color: var(--ink); }
+dialog::backdrop { background: rgba(6,18,12,.6); }
+dialog h2 { margin: 0 0 10px; font-size: 21px; }
+dialog textarea { width: 100%; height: 230px; font: 15px/1.5 ui-monospace, Menlo, Consolas, monospace; background: var(--field); color: var(--ink); border: 1px solid var(--line); border-radius: 12px; padding: 10px; resize: vertical; }
+dialog img { width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--line); display: block; max-height: 56vh; object-fit: contain; background: #fff; }
+.hint { color: var(--muted); font-size: 13px; margin: 8px 0 0; }
+.dlg-actions { display: flex; gap: 8px; margin-top: 12px; }
+.dlg-actions button { flex: 1; height: 46px; border-radius: 13px; border: 1px solid var(--line); background: var(--field); font-weight: 600; }
+.dlg-actions .main { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 700; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(86px + env(safe-area-inset-bottom, 0px)); background: var(--hero); color: #fff; padding: 10px 16px; border-radius: 12px; font-size: 14px; z-index: 20; max-width: 90vw; text-align: center; }
+.toast[hidden] { display: none; }
+
+@media print {
+  :root { padding: 0; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .add, .bar, .theme-btn, .stepper button, .del, .tools, .sub, .toast { display: none !important; }
+  body { background: #fff; color: #000; }
+  .hero { background: #fff !important; color: #000 !important; border: 0 !important; padding: 0 0 8px !important; }
+  .hero .title-input, .hero .orderfor input { color: #000 !important; background: none !important; border: 0 !important; height: auto !important; }
+  .orderfor label { color: #555 !important; }
+  .cat, .totalbox { box-shadow: none; break-inside: avoid; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<header class="hero"><div class="hero-in">
+  <div class="head">
+    <input id="shop" class="title-input" type="text" value="Saeedi Essence" aria-label="Shop name" maxlength="60">
+    <button class="icon-btn theme-btn" id="themeBtn" aria-label="Switch light or dark theme" type="button">◐</button>
+  </div>
+  <div class="field orderfor"><label for="orderCo">Order for company</label><input id="orderCo" type="text" list="companies" placeholder="Type the company name once" autocomplete="off" maxlength="60"></div>
+  </div></header>
+<div class="wrap">
+  <p class="sub">Add items with company, weight and quantity. Then print, save a PDF, or make a picture to send.</p>
+
+  <div class="add">
+    <div class="stack" id="addFields"></div>
+    <button class="primary" id="addBtn" type="button">Add to order</button>
+  </div>
+
+  <div class="summary">
+    <h2>Your list</h2>
+    <span id="count"></span>
+  </div>
+  <div class="tools">
+    <div class="seg" role="group" aria-label="Group list by">
+      <button type="button" id="gCat" aria-pressed="true">By category</button>
+      <button type="button" id="gCo" aria-pressed="false">By company</button>
+    </div>
+    <button class="linkbtn" id="clearBtn" type="button">Clear all</button>
+  </div>
+  <div id="list"></div>
+</div>
+
+<datalist id="cats"></datalist>
+<datalist id="companies"></datalist>
+
+<div class="bar">
+  <div class="bar-in">
+    <button id="textBtn" type="button">Text</button>
+    <button id="printBtn" type="button">Print</button>
+    <button id="pdfBtn" type="button">PDF</button>
+    <button id="picBtn" class="main" type="button">Picture</button>
+  </div>
+</div>
+
+<dialog id="dlg">
+  <h2>Order text</h2>
+  <textarea id="out" readonly></textarea>
+  <div class="dlg-actions">
+    <button id="closeDlg" type="button">Close</button>
+    <button id="copyBtn" class="main" type="button">Copy text</button>
+  </div>
+</dialog>
+
+<dialog id="picDlg">
+  <h2>Picture to send</h2>
+  <img id="picImg" alt="Picture of your order list">
+  <p class="hint">Share it straight to WhatsApp, Instagram or any app. If sharing is not available, save it or press and hold the picture.</p>
+  <div class="dlg-actions">
+    <button id="picClose" type="button">Close</button>
+    <button id="picSave" type="button">Save</button>
+    <button id="picShare" class="main" type="button">Share</button>
+  </div>
+</dialog>
+
+<dialog id="editDlg">
+  <h2>Edit item</h2>
+  <div class="stack" id="editFields"></div>
+  <div class="dlg-actions">
+    <button id="eDel" type="button">Remove</button>
+    <button id="eCancel" type="button">Cancel</button>
+    <button id="eSave" class="main" type="button">Save</button>
+  </div>
+</dialog>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function () {
+  var KEY = 'order-list-maker-v1';
+  var PAL = ['#D98E04', '#C8331F', '#1E7A55', '#3B5BA5', '#7A3B69', '#1F8A8A', '#A0621A', '#6B7A1F'];
+  var WU = ['', 'g', 'kg', 'lb', 'oz', 'ml', 'L'];
+  var QU = ['pcs', 'box', 'pack', 'dozen', 'bag', 'bottle', 'carton', ''];
+  var state = { shop: 'Saeedi Essence', orderCo: '', recentCos: [], items: [], theme: '', groupBy: 'cat', catOrder: [] };
+  var dl = null;
+  var editing = null;
+  var picCanvas = null;
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (raw) {
+        var s = JSON.parse(raw);
+        if (s && Array.isArray(s.items)) state = s;
+      }
+    } catch (e) {}
+    if (!state.catOrder) state.catOrder = [];
+    if (!state.shop) state.shop = 'Saeedi Essence';
+    if (state.orderCo == null) state.orderCo = '';
+    if (!state.recentCos) state.recentCos = [];
+    if (!state.groupBy) state.groupBy = 'cat';
+    state.items.forEach(function (it) {
+      if (it.company == null) it.company = '';
+      if (it.wt == null) it.wt = '';
+      if (it.wu == null) it.wu = '';
+      if (it.qu == null) it.qu = it.unit || '';
+      if (it.qty == null) it.qty = 1;
+    });
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+  var $ = function (id) { return document.getElementById(id); };
+  var uid = function () { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); };
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function toast(msg) {
+    var t = $('toast'); t.textContent = msg; t.hidden = false;
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function () { t.hidden = true; }, 2600);
+  }
+  function openD(d) { if (d.showModal) d.showModal(); else d.setAttribute('open', ''); }
+  function closeD(d) { if (d.close) d.close(); else d.removeAttribute('open'); }
+  function fmt(n) { return (Math.round(Number(n) * 100) / 100).toString(); }
+  function fmtWeight(it) { return (it.wt !== '' && it.wt != null) ? fmt(it.wt) + (it.wu ? ' ' + it.wu : '') : ''; }
+  function fmtQty(it) { return fmt(it.qty) + (it.qu ? ' ' + it.qu : ''); }
+  var PL = { box: 'boxes', pack: 'packs', bag: 'bags', bottle: 'bottles', carton: 'cartons' };
+  function plural(u, n) { return Number(n) === 1 ? (u || 'unit') : (u ? (PL[u] || u) : 'units'); }
+  function totalsStr(items) {
+    var map = {}, order = [];
+    items.forEach(function (i) {
+      var u = i.qu || '';
+      if (map[u] == null) { map[u] = 0; order.push(u); }
+      map[u] += Number(i.qty) || 0;
+    });
+    return order.map(function (u) { return fmt(map[u]) + ' ' + plural(u, map[u]); }).join(', ');
+  }
+  function slug() { return ((state.shop || '') + ' ' + (state.orderCo || '')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'order'; }
+
+  function uniq(field) {
+    var seen = [];
+    state.items.forEach(function (it) { var v = it[field]; if (v && seen.indexOf(v) === -1) seen.push(v); });
+    return seen;
+  }
+  function coOf(it) { return it.company || state.orderCo || ''; }
+  function gkey(it) { return state.groupBy === 'company' ? (coOf(it) || 'No company') : (it.cat || 'General'); }
+  function groups() {
+    var map = Object.create(null), arr = [];
+    state.items.forEach(function (it) {
+      var k = gkey(it);
+      if (!map[k]) { map[k] = { name: k, items: [] }; arr.push(map[k]); }
+      map[k].items.push(it);
+    });
+    return arr;
+  }
+  function colorIdx(name) {
+    var i = state.catOrder.indexOf(name);
+    if (i === -1) { state.catOrder.push(name); i = state.catOrder.length - 1; }
+    return i % 8;
+  }
+  function colorVar(name) { return 'var(--c' + colorIdx(name) + ')'; }
+
+  function opts(list) {
+    return list.map(function (v) { return '<option value="' + v + '">' + (v || 'none') + '</option>'; }).join('');
+  }
+  function fieldsHTML(p) {
+    return '' +
+      '<div class="field"><label for="' + p + 'name">Item</label><input id="' + p + 'name" type="text" placeholder="e.g. Basmati rice" autocomplete="off" maxlength="80"></div>' +
+      '<div class="field"><label for="' + p + 'company">Company name (optional)</label><input id="' + p + 'company" type="text" list="companies" placeholder="Same as order company" autocomplete="off" maxlength="60"></div>' +
+      '<div class="field"><label for="' + p + 'cat">Category</label><input id="' + p + 'cat" type="text" list="cats" placeholder="e.g. Grocery" autocomplete="off" maxlength="40"></div>' +
+      (p === 'a' ? '<div class="chips" id="chips" aria-label="Existing categories"></div>' : '') +
+      '<div class="field"><label for="' + p + 'wt">Weight</label><div class="pair"><input id="' + p + 'wt" type="number" inputmode="decimal" min="0" step="any" placeholder="0"><select id="' + p + 'wu" aria-label="Weight unit">' + opts(WU) + '</select></div></div>' +
+      '<div class="field"><label for="' + p + 'qty">Quantity</label><div class="pair"><input id="' + p + 'qty" type="number" inputmode="decimal" min="0" step="any" value="1"><select id="' + p + 'qu" aria-label="Quantity unit">' + opts(QU) + '</select></div></div>';
+  }
+  function readFields(p) {
+    var wt = parseFloat($(p + 'wt').value);
+    var qty = parseFloat($(p + 'qty').value);
+    return {
+      name: $(p + 'name').value.trim(),
+      company: $(p + 'company').value.trim(),
+      cat: $(p + 'cat').value.trim() || 'General',
+      wt: (isFinite(wt) && wt >= 0) ? wt : '',
+      wu: $(p + 'wu').value,
+      qty: (isFinite(qty) && qty >= 0) ? qty : 1,
+      qu: $(p + 'qu').value
+    };
+  }
+  function setFields(p, it) {
+    $(p + 'name').value = it.name || '';
+    $(p + 'company').value = it.company || '';
+    $(p + 'cat').value = it.cat || '';
+    $(p + 'wt').value = (it.wt === '' || it.wt == null) ? '' : it.wt;
+    $(p + 'wu').value = it.wu || '';
+    $(p + 'qty').value = it.qty == null ? 1 : it.qty;
+    $(p + 'qu').value = it.qu || '';
+  }
+  function matchCase(val, list) {
+    var f = list.filter(function (c) { return c.toLowerCase() === val.toLowerCase(); })[0];
+    return f || val;
+  }
+
+  function renderLists() {
+    var dc = $('cats'), dco = $('companies');
+    dc.textContent = ''; dco.textContent = '';
+    uniq('cat').forEach(function (c) { var o = el('option'); o.value = c; dc.appendChild(o); });
+    var cos = uniq('company');
+    (state.recentCos || []).forEach(function (c) { if (cos.indexOf(c) === -1) cos.push(c); });
+    cos.forEach(function (c) { var o = el('option'); o.value = c; dco.appendChild(o); });
+  }
+  function renderChips() {
+    var box = $('chips'); box.textContent = '';
+    var cur = $('acat').value.trim();
+    uniq('cat').forEach(function (c) {
+      var b = el('button', 'chip'); b.type = 'button';
+      b.setAttribute('aria-pressed', String(cur === c));
+      var dot = el('i'); dot.style.background = colorVar(c);
+      b.appendChild(dot); b.appendChild(document.createTextNode(c));
+      b.addEventListener('click', function () { $('acat').value = c; renderChips(); });
+      box.appendChild(b);
+    });
+  }
+
+  var CHECK = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg>';
+
+  function render() {
+    renderLists(); renderChips();
+    $('gCat').setAttribute('aria-pressed', String(state.groupBy === 'cat'));
+    $('gCo').setAttribute('aria-pressed', String(state.groupBy === 'company'));
+    var list = $('list'); list.textContent = '';
+    var total = state.items.length;
+    var gs = groups();
+    $('count').textContent = total ? total + (total === 1 ? ' item' : ' items') : '';
+
+    if (!total) {
+      var em = el('div', 'empty');
+      em.appendChild(el('b', '', 'No items yet'));
+      em.appendChild(document.createTextNode('Type an item above, add its company, weight and quantity, then choose a category.'));
+      list.appendChild(em);
+      return;
+    }
+
+    gs.forEach(function (g) {
+      var card = el('section', 'cat');
+      card.style.setProperty('--cc', colorVar(g.name));
+      var head = el('div', 'cat-head');
+      head.appendChild(el('h3', '', g.name));
+      head.appendChild(el('small', '', g.items.length + (g.items.length === 1 ? ' item' : ' items') + ', ' + totalsStr(g.items)));
+      card.appendChild(head);
+
+      g.items.forEach(function (it, idx) {
+        var row = el('div', 'item');
+        var no = el('span', 'no', String(idx + 1));
+
+        var info = el('button', 'info'); info.type = 'button';
+        info.setAttribute('aria-label', 'Edit ' + it.name);
+        info.appendChild(el('span', 'iname', it.name));
+        var meta = el('span', 'meta');
+        var second = state.groupBy === 'company' ? it.cat : ((it.company && it.company !== state.orderCo) ? it.company : '');
+        if (second) meta.appendChild(el('span', '', second));
+        var w = fmtWeight(it);
+        if (w) meta.appendChild(el('span', 'wchip', w));
+        if (meta.childNodes.length) info.appendChild(meta);
+        info.addEventListener('click', function () { openEdit(it); });
+
+        var st = el('div', 'stepper');
+        var minus = el('button', '', '−'); minus.type = 'button'; minus.setAttribute('aria-label', 'Decrease ' + it.name);
+        var plus = el('button', '', '+'); plus.type = 'button'; plus.setAttribute('aria-label', 'Increase ' + it.name);
+        var val = el('div', 'val', fmt(it.qty));
+        if (it.qu) val.appendChild(el('small', '', it.qu));
+        minus.addEventListener('click', function () { it.qty = Math.max(0, Number(it.qty) - 1); save(); render(); });
+        plus.addEventListener('click', function () { it.qty = Number(it.qty) + 1; save(); render(); });
+        st.appendChild(minus); st.appendChild(val); st.appendChild(plus);
+
+        var del = el('button', 'del', '×'); del.type = 'button'; del.setAttribute('aria-label', 'Remove ' + it.name);
+        del.addEventListener('click', function () { removeItem(it); });
+
+        row.appendChild(no); row.appendChild(info); row.appendChild(st); row.appendChild(del);
+        card.appendChild(row);
+      });
+      list.appendChild(card);
+    });
+    var tb = el('div', 'totalbox');
+    tb.appendChild(el('span', 'tl', 'Total'));
+    tb.appendChild(el('strong', 'tv', totalsStr(state.items)));
+    list.appendChild(tb);
+  }
+
+  function removeItem(it) {
+    state.items = state.items.filter(function (x) { return x.id !== it.id; });
+    save(); render();
+  }
+
+  function addItem() {
+    var f = readFields('a');
+    if (!f.name) { toast('Type an item name first'); $('aname').focus(); return; }
+    f.cat = matchCase(f.cat, uniq('cat'));
+    if (f.company) f.company = matchCase(f.company, uniq('company'));
+    f.id = uid(); f.done = false;
+    state.items.push(f);
+    save();
+    $('aname').value = ''; $('awt').value = ''; $('aqty').value = '1';
+    render();
+    $('aname').focus();
+  }
+
+  function openEdit(it) { editing = it; setFields('e', it); openD($('editDlg')); }
+
+  function buildText() {
+    var lines = [state.shop || 'Order'];
+    if (state.orderCo) lines.push('Order for: ' + state.orderCo);
+    lines.push(new Date().toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' }), '');
+    groups().forEach(function (g) {
+      lines.push(g.name.toUpperCase());
+      g.items.forEach(function (i, k) {
+        var second = state.groupBy === 'company' ? i.cat : ((i.company && i.company !== state.orderCo) ? i.company : '');
+        var s = (k + 1) + '. ' + i.name + (second ? ' (' + second + ')' : '');
+        var w = fmtWeight(i);
+        if (w) s += ' - ' + w;
+        s += ' - Qty: ' + fmtQty(i);
+        lines.push(s);
+      });
+      lines.push('Total: ' + totalsStr(g.items));
+      lines.push('');
+    });
+    lines.push('TOTAL: ' + totalsStr(state.items));
+    return lines.join('\n').trim();
+  }
+
+  /* ---------- Picture and PDF drawing ---------- */
+  var W = 1080, M = 56, IW = W - 2 * M, TITLE_H = 140, GH = 58, CH = 38, IH = 52, GAP = 26, FOOT = 34, PAGE_H = 1526;
+  var HEAD = '"Bricolage Grotesque","Figtree",system-ui,sans-serif';
+  var BODY = '"Figtree",system-ui,sans-serif';
+
+  function ensureFonts() {
+    if (!document.fonts || !document.fonts.load) return Promise.resolve();
+    return Promise.all([
+      document.fonts.load('700 30px "Bricolage Grotesque"'),
+      document.fonts.load('500 24px "Figtree"'),
+      document.fonts.load('600 24px "Figtree"')
+    ]).catch(function () {});
+  }
+  function fit(ctx, text, maxW) {
+    text = String(text);
+    if (ctx.measureText(text).width <= maxW) return text;
+    while (text.length > 1 && ctx.measureText(text + '…').width > maxW) text = text.slice(0, -1);
+    return text + '…';
+  }
+  function rr(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function planPages(pageH) {
+    var top1 = (state.orderCo ? 220 : 176) + 30, topN = M;
+    var bottom = pageH ? pageH - M - FOOT : Infinity;
+    var pages = [{ ops: [], y: top1 }];
+    function cur() { return pages[pages.length - 1]; }
+    groups().forEach(function (g) {
+      var idx = 0;
+      while (idx < g.items.length) {
+        var need = GH + CH + IH;
+        var pageTop = pages.length === 1 ? top1 : topN;
+        if (pageH && cur().y + need > bottom && cur().y > pageTop) {
+          pages.push({ ops: [], y: topN });
+        }
+        var p = cur();
+        p.ops.push({ t: 'g', y: p.y, g: g, cont: idx > 0 }); p.y += GH;
+        p.ops.push({ t: 'c', y: p.y }); p.y += CH;
+        var placed = 0;
+        while (idx < g.items.length && (p.y + IH <= bottom || placed === 0)) {
+          p.ops.push({ t: 'i', y: p.y, it: g.items[idx], g: g, n: idx + 1 });
+          p.y += IH; idx++; placed++;
+        }
+        p.y += GAP;
+      }
+    });
+    if (state.items.length) {
+      if (pageH && cur().y + 56 > bottom && cur().y > topN) pages.push({ ops: [], y: topN });
+      var tp = cur();
+      tp.ops.push({ t: 't', y: tp.y }); tp.y += 56 + GAP;
+    }
+    return pages;
+  }
+
+  function drawPage(page, pi, total, pageH, S) {
+    var h = pageH || Math.ceil(page.y + M - GAP + 10);
+    var c = document.createElement('canvas');
+    c.width = W * S; c.height = h * S;
+    var x = c.getContext('2d');
+    x.scale(S, S);
+    x.fillStyle = '#ffffff'; x.fillRect(0, 0, W, h);
+    x.textBaseline = 'alphabetic';
+
+    if (pi === 0) {
+      var bandH = state.orderCo ? 220 : 176;
+      x.fillStyle = '#0F3D2E'; x.fillRect(0, 0, W, bandH);
+      x.fillStyle = '#F2B01E'; x.fillRect(0, bandH - 8, W, 8);
+      x.textAlign = 'left';
+      x.fillStyle = '#ffffff';
+      x.font = '700 56px ' + HEAD;
+      x.fillText(fit(x, state.shop || 'Order', IW), M, 96);
+      var ty = 146;
+      if (state.orderCo) {
+        x.font = '600 32px ' + BODY;
+        x.fillStyle = '#F2B01E';
+        x.fillText(fit(x, 'Order for: ' + state.orderCo, IW), M, ty);
+        ty += 44;
+      }
+      var gs = groups();
+      var d = new Date().toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' });
+      x.font = '500 24px ' + BODY;
+      x.fillStyle = '#B9CFC1';
+      x.fillText(d + '   |   ' + state.items.length + (state.items.length === 1 ? ' item' : ' items') + ' in ' + gs.length + (gs.length === 1 ? ' group' : ' groups'), M, ty);
+    }
+
+    var second = state.groupBy === 'company' ? 'Category' : 'Company';
+    page.ops.forEach(function (op) {
+      if (op.t === 'g') {
+        x.fillStyle = PAL[colorIdx(op.g.name)];
+        x.fillRect(M, op.y + 10, 10, GH - 20);
+        x.fillStyle = '#10261C';
+        x.font = '700 30px ' + HEAD; x.textAlign = 'left';
+        x.fillText(fit(x, op.g.name + (op.cont ? ' (continued)' : ''), IW - 360), M + 26, op.y + 38);
+        x.fillStyle = '#5B6F63';
+        x.font = '500 22px ' + BODY; x.textAlign = 'right';
+        x.fillText(fit(x, op.g.items.length + (op.g.items.length === 1 ? ' item' : ' items') + ', ' + totalsStr(op.g.items), 330), W - M, op.y + 37);
+      } else if (op.t === 't') {
+        x.fillStyle = '#10261C'; rr(x, M, op.y, IW, 56, 12); x.fill();
+        x.fillStyle = '#ffffff'; x.textAlign = 'left'; x.font = '600 24px ' + BODY;
+        x.fillText('Total', M + 20, op.y + 36);
+        x.textAlign = 'right'; x.font = '700 28px ' + HEAD; x.fillStyle = '#F2B01E';
+        x.fillText(fit(x, totalsStr(state.items), IW - 160), W - M - 20, op.y + 37);
+      } else if (op.t === 'c') {
+        x.fillStyle = '#E9F0EA'; x.fillRect(M, op.y, IW, CH);
+        x.fillStyle = '#5B6F63'; x.font = '600 20px ' + BODY;
+        x.textAlign = 'left';
+        x.fillText('#', M + 16, op.y + 26);
+        x.fillText('Item', M + 62, op.y + 26);
+        x.fillText(second, M + 390, op.y + 26);
+        x.fillText('Weight', M + 650, op.y + 26);
+        x.textAlign = 'right';
+        x.fillText('Qty', W - M - 16, op.y + 26);
+      } else {
+        var it = op.it, col = PAL[colorIdx(op.g.name)];
+        x.textAlign = 'left';
+        x.font = '600 22px ' + BODY;
+        x.fillStyle = '#5B6F63';
+        x.fillText(String(op.n), M + 16, op.y + 33);
+        x.font = '500 25px ' + BODY;
+        x.fillStyle = '#10261C';
+        x.fillText(fit(x, it.name, 316), M + 62, op.y + 33);
+        x.fillStyle = '#3F5A4A';
+        x.font = '400 23px ' + BODY;
+        var sec = state.groupBy === 'company' ? it.cat : coOf(it);
+        x.fillText(fit(x, sec || '', 250), M + 390, op.y + 33);
+        x.fillText(fit(x, fmtWeight(it), 165), M + 650, op.y + 33);
+        x.fillStyle = '#10261C';
+        x.font = '600 25px ' + BODY; x.textAlign = 'right';
+        x.fillText(fit(x, fmtQty(it), 140), W - M - 16, op.y + 33);
+        x.fillStyle = '#DCE6DF'; x.fillRect(M, op.y + IH - 1, IW, 1);
+      }
+    });
+
+    if (pageH && total > 1) {
+      x.fillStyle = '#8FA398'; x.font = '500 20px ' + BODY; x.textAlign = 'right';
+      x.fillText('Page ' + (pi + 1) + ' of ' + total, W - M, h - M + 12);
+    }
+    return c;
+  }
+
+  function canvasBlob(c) {
+    return new Promise(function (res, rej) {
+      c.toBlob(function (b) { b ? res(b) : rej(new Error('blob')); }, 'image/png');
+    });
+  }
+
+  function blobBase64(blob) {
+    return new Promise(function (resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function () {
+        var data = String(reader.result || '');
+        var comma = data.indexOf(',');
+        if (comma < 0) reject(new Error('base64'));
+        else resolve(data.slice(comma + 1));
+      };
+      reader.onerror = function () { reject(reader.error || new Error('read')); };
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  function saveFile(name, blob) {
+    if (window.AndroidApp && window.AndroidApp.saveFile) {
+      return blobBase64(blob).then(function (data) {
+        try {
+          var ok = window.AndroidApp.saveFile(name, data, blob.type || 'application/octet-stream');
+          toast(ok ? 'Saved to Downloads' : 'Could not save the file');
+        } catch (e) { toast('Could not save the file'); }
+      }).catch(function () { toast('Could not save the file'); });
+    }
+    if (!dl) {
+      try {
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url; a.download = name;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+        toast('Saved');
+      } catch (e) {
+        toast('Saving is not available here. Use Share, or press and hold the picture.');
+      }
+      return Promise.resolve();
+    }
+    return dl.save({ filename: name, data: blob }).then(function () {
+      toast('Saved');
+    }).catch(function (e) {
+      if (e && e.code === 'declined') return;
+      toast('Could not save the file');
+    });
+  }
+
+  function requireItems() {
+    if (!state.items.length) { toast('Add some items first'); return false; }
+    return true;
+  }
+
+  function makePicture() {
+    if (!requireItems()) return;
+    ensureFonts().then(function () {
+      var pages = planPages(null);
+      picCanvas = drawPage(pages[0], 0, 1, null, 1);
+      $('picImg').src = picCanvas.toDataURL('image/png');
+      openD($('picDlg'));
+    });
+  }
+
+  function makePDF() {
+    if (!requireItems()) return;
+    if (!window.jspdf || !window.jspdf.jsPDF) { toast('PDF maker did not load. Try Print instead.'); return; }
+    toast('Making PDF…');
+    ensureFonts().then(function () {
+      var pages = planPages(PAGE_H);
+      var pdf = new window.jspdf.jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+      pages.forEach(function (p, i) {
+        var c = drawPage(p, i, pages.length, PAGE_H, 2);
+        if (i) pdf.addPage();
+        pdf.addImage(c.toDataURL('image/png'), 'PNG', 0, 0, 210, 297, undefined, 'FAST');
+      });
+      return saveFile(slug() + '.pdf', pdf.output('blob'));
+    }).catch(function () { toast('Could not make the PDF'); });
+  }
+
+  /* ---------- Events ---------- */
+  $('addFields').innerHTML = fieldsHTML('a');
+  $('editFields').innerHTML = fieldsHTML('e');
+  $('aqu').value = 'pcs';
+
+  $('addBtn').addEventListener('click', addItem);
+  ['aname', 'acompany', 'acat', 'awt', 'aqty'].forEach(function (id) {
+    $(id).addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); addItem(); } });
+  });
+  $('acat').addEventListener('input', renderChips);
+  $('shop').addEventListener('input', function () { state.shop = $('shop').value; save(); });
+  $('orderCo').addEventListener('input', function () { state.orderCo = $('orderCo').value; save(); render(); });
+  $('orderCo').addEventListener('change', function () {
+    var v = $('orderCo').value.trim();
+    if (v && state.recentCos.indexOf(v) === -1) { state.recentCos.unshift(v); state.recentCos = state.recentCos.slice(0, 20); save(); renderLists(); }
+  });
+
+  $('gCat').addEventListener('click', function () { state.groupBy = 'cat'; save(); render(); });
+  $('gCo').addEventListener('click', function () { state.groupBy = 'company'; save(); render(); });
+
+  $('eSave').addEventListener('click', function () {
+    if (!editing) return;
+    var f = readFields('e');
+    if (!f.name) { toast('Item name cannot be empty'); return; }
+    f.cat = matchCase(f.cat, uniq('cat'));
+    if (f.company) f.company = matchCase(f.company, uniq('company'));
+    ['name', 'company', 'cat', 'wt', 'wu', 'qty', 'qu'].forEach(function (k) { editing[k] = f[k]; });
+    save(); render(); closeD($('editDlg')); editing = null;
+  });
+  $('eCancel').addEventListener('click', function () { closeD($('editDlg')); editing = null; });
+  $('eDel').addEventListener('click', function () { if (editing) removeItem(editing); closeD($('editDlg')); editing = null; });
+
+  $('textBtn').addEventListener('click', function () {
+    if (!requireItems()) return;
+    $('out').value = buildText();
+    openD($('dlg')); $('out').focus(); $('out').select();
+  });
+  $('closeDlg').addEventListener('click', function () { closeD($('dlg')); });
+  $('copyBtn').addEventListener('click', function () {
+    var txt = $('out').value;
+    var fallback = function () {
+      $('out').focus(); $('out').select();
+      try { document.execCommand('copy'); toast('Copied'); } catch (e) { toast('Press and hold to copy'); }
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function () { toast('Copied'); }).catch(fallback);
+    else fallback();
+  });
+
+  $('printBtn').addEventListener('click', function () {
+    if (!requireItems()) return;
+    try { window.print(); } catch (e) { toast('Printing is not available here. Use PDF instead.'); }
+  });
+  $('pdfBtn').addEventListener('click', makePDF);
+  $('picBtn').addEventListener('click', makePicture);
+  $('picClose').addEventListener('click', function () { closeD($('picDlg')); });
+  $('picSave').addEventListener('click', function () {
+    if (!picCanvas) return;
+    canvasBlob(picCanvas).then(function (b) { return saveFile(slug() + '.png', b); }).catch(function () { toast('Could not save the picture'); });
+  });
+  $('picShare').addEventListener('click', function () {
+    if (!picCanvas) return;
+    canvasBlob(picCanvas).then(function (b) {
+      var name = slug() + '.png';
+      if (window.AndroidApp && window.AndroidApp.shareFile) {
+        return blobBase64(b).then(function (data) {
+          try {
+            if (!window.AndroidApp.shareFile(name, data, b.type || 'image/png')) toast('Sharing is not available here. Use Save instead.');
+          } catch (e) { toast('Sharing is not available here. Use Save instead.'); }
+        });
+      }
+      var f = new File([b], name, { type: 'image/png' });
+      if (navigator.canShare && navigator.canShare({ files: [f] }) && navigator.share) {
+        return navigator.share({ files: [f], title: state.shop || 'Order' }).catch(function (e) {
+          if (e && e.name === 'AbortError') return;
+          toast('Sharing is not available here. Use Save instead.');
+        });
+      }
+      toast('Sharing is not available here. Use Save instead.');
+    }).catch(function () { toast('Could not share the picture'); });
+  });
+
+  $('clearBtn').addEventListener('click', function () {
+    if (!state.items.length) return;
+    var b = $('clearBtn');
+    if (b.dataset.armed === '1') {
+      state.items = []; state.catOrder = [];
+      save(); render(); b.textContent = 'Clear all'; b.dataset.armed = '0';
+    } else {
+      b.dataset.armed = '1'; b.textContent = 'Tap again to clear';
+      setTimeout(function () { b.dataset.armed = '0'; b.textContent = 'Clear all'; }, 2500);
+    }
+  });
+
+  function applyTheme() {
+    if (state.theme) document.documentElement.setAttribute('data-theme', state.theme);
+    else document.documentElement.removeAttribute('data-theme');
+  }
+  $('themeBtn').addEventListener('click', function () {
+    var dark = state.theme ? state.theme === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    state.theme = dark ? 'light' : 'dark';
+    save(); applyTheme();
+  });
+
+  load();
+  $('shop').value = state.shop || 'Saeedi Essence';
+  $('orderCo').value = state.orderCo || '';
+  applyTheme();
+  render();
+
+  try {
+    if (window.claude && window.claude.use) {
+      window.claude.use('downloads').then(function (d) { dl = d || null; }).catch(function () {});
+    }
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>

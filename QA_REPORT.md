@@ -3,7 +3,9 @@
 **Test date:** 18 October 2026 (Asia/Karachi)  
 **Target:** `index-1.html`  
 **Repository revision tested:** `c8bfd08` (`arena/2aff49b3-order`)  
-**Overall result:** 10 findings — **6 Major, 4 Minor, 0 Critical**
+**Overall result at the tested revision:** 10 findings — **6 Major, 4 Minor, 0 Critical**.
+
+**Resolved in the Android packaging follow-up:** Q-01 and Q-06.
 
 ## Test approach and limitations
 
@@ -28,6 +30,8 @@
 **Actual:** `groups()` uses a plain `{}` as a map. The inherited property is mistaken for a group, causing `TypeError: Cannot read properties of undefined (reading 'push')`. The item is saved to localStorage before rendering fails, so the same error recurs on reload and the saved order is no longer usable in the normal UI. This was reproduced in the DOM test.
 
 **Suggested fix:** Use `Map` or `Object.create(null)` for user-controlled group keys (and validate loaded state before rendering).
+
+**Status:** Fixed in the Android packaging follow-up with a prototype-safe group map; special-name regression checks pass.
 
 ### Q-02 — Invalid weight and quantity values are accepted or silently changed (**Major**)
 
@@ -91,7 +95,9 @@
 2. Inspect the tracked root files and visit the published root URL.
 
 **Expected:** The app is available at the site root as described.  
-**Actual:** The tracked app is `index-1.html`; there is no `index.html`. The README refers to `index.html` and instructs users to upload/update that filename. A root Pages URL will not find the documented default entry point (the app may only be reachable by its explicit `/index-1.html` path).
+**Actual at the tested revision:** The tracked app was `index-1.html`; there was no `index.html`. The README referred to `index.html` and instructed users to upload/update that filename. A root Pages URL would not find the documented default entry point.
+
+**Status:** Resolved in the Android packaging follow-up by making `index.html` the canonical web entry point.
 
 **Suggested fix:** Publish the app as `index.html`, or update the deployment instructions/configuration so the root URL serves `index-1.html`.
 
@@ -157,19 +163,19 @@
 
 ## Summary and priorities
 
-| Severity | Count |
+| Severity at tested revision | Count |
 |---|---:|
 | Critical | 0 |
 | Major | 6 |
 | Minor | 4 |
 | **Total** | **10** |
 
-### Top 5 fixes to make first
+### Top 5 remaining fixes to make first
 
 1. **Q-02:** Prevent silent changes to entered weights and quantities; validate before saving.
-2. **Q-01:** Use prototype-safe maps so special category/company names cannot break the app or persist a broken order.
-3. **Q-03:** Make long-list picture output paginated and readable, with safe canvas bounds.
-4. **Q-04:** Preserve full item/company/category text in picture and PDF exports.
-5. **Q-06:** Make the GitHub Pages root entry point match the README (`index.html` or equivalent configuration).
+2. **Q-03:** Make long-list picture output paginated and readable, with safe canvas bounds.
+3. **Q-04:** Preserve full item/company/category text in picture and PDF exports.
+4. **Q-05:** Add category CRUD and a true category filter.
+5. **Q-07:** Avoid overflow when formatting very large finite quantities.
 
-**Also high priority for the requested workflow:** Q-05, category CRUD/filter support, is not currently available.
+Q-01 (prototype-safe grouping) and Q-06 (the `index.html` entry point) were resolved in the Android packaging follow-up.

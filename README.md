@@ -1,47 +1,49 @@
 # Saeedi Essence Order List
 
-A simple order list app for making shop orders on your phone. It is one HTML file (`index.html`) with no install and no server.
+A simple order-list maker for shop orders. The web app is `index.html`; its fonts and PDF library are bundled locally. The Android project wraps the same app in a lightweight native WebView and adds Android file saving and sharing.
 
 ## What it does
 
-- Add items with **company name**, **category**, **weight** and **quantity**
-- Type the **order company** once at the top and it applies to the whole order
-- Items are numbered 1, 2, 3 and so on
-- Group the list **by category** or **by company**
-- Shows the **total quantity** (for example, 7 cartons) for each group and for the whole order
-- **PDF**: makes an A4 document with the shop name and company in the heading
-- **Picture**: makes an image to share on WhatsApp, Instagram or other apps
-- **Text**: copies the order as plain text
-- **Print**: prints the list
-- Light and dark theme
-- Your list is saved automatically in your browser
+- Add items with company name, category, weight, and quantity
+- Apply one order company to items that do not have a separate company
+- Group the list by category or company
+- Show quantity totals for each group and for the whole order
+- Export as PDF, a shareable picture, plain text, or a printed list
+- Light and dark themes
+- Automatically save the order on the current device
 
-## How to use
+## Install the Android app
 
-1. Open the app link on your phone.
-2. Type the company name in **Order for company**.
-3. Add each item with its weight, quantity and category.
-4. Tap **PDF** or **Picture** to send the order.
+A directly installable **debug-signed APK** is built by GitHub Actions. It supports Android 10 (API 29) and newer.
 
-## Put it on your phone like an app
+1. Open the [**Build Android APK** workflow](https://github.com/Zain6075/Order-/actions/workflows/android-apk.yml) (or the repository's **Actions** tab). A push to the app branch also starts this workflow automatically.
+2. Open the latest successful run and download the **Saeedi-Essence-Android-debug** artifact.
+3. Unzip the artifact, open `app-debug.apk` on the Android device, and approve Android's “install unknown apps” prompt if shown.
 
-Open the link in your phone browser, then:
+The APK bundles the app, fonts, and PDF library, so making an order does not require an internet connection. The **Save** button writes PNG/PDF files to `Downloads/Saeedi Essence Orders`; **Share** opens Android's share sheet. Orders are kept in this app's private browser storage and are not shared with the web-browser copy. Uninstalling the app or clearing its app data removes its saved orders.
 
-- **Android (Chrome):** tap the menu (three dots), then **Add to Home screen**
-- **iPhone (Safari):** tap Share, then **Add to Home Screen**
+This is a debug build for direct installation, not a Play Store release. A Play Store release would need a production signing key and release configuration.
 
-## Publish with GitHub Pages
+### Build locally
 
-1. Upload `index.html` to this repository.
-2. Go to **Settings**, then **Pages**.
-3. Under Source choose **Deploy from a branch**, then **main** and **/ (root)**, and save.
-4. After 1 to 2 minutes your link appears at the top of the Pages screen.
+Install JDK 17, Android SDK Platform 35, Build Tools 35.0.0, and Gradle 8.9, then run:
 
-To update the app later, upload a new `index.html` with the same name.
+```sh
+cd android
+gradle :app:assembleDebug
+```
 
-## Notes
+The APK is written to `android/app/build/outputs/apk/debug/app-debug.apk`.
 
-- Your orders are stored only in your own browser. Nobody else can see them.
-- The list from one browser or device does not appear on another.
-- The PDF maker and fonts load from the internet, so the first use needs a connection.
-- The PDF is made from the same picture as the shared image, so its text cannot be selected or copied.
+## Use the web app
+
+Open `index.html` in a modern browser. Orders are saved only in that browser's local storage. To publish with GitHub Pages, publish the repository root (not just the HTML file), so `index.html`, `fonts/`, and `vendor/` are all available. The root URL then opens the app.
+
+To create a browser shortcut instead of installing the APK, open the hosted HTTPS page in Chrome and use **⋮ → Add to Home screen**. This shortcut opens the website; it is not the standalone Android package.
+
+## Privacy and limitations
+
+- Orders are stored locally on the device. They do not synchronize between browsers or devices.
+- The installed APK includes the PDF generator and fonts and works offline. The hosted web version needs the site assets to be available.
+- The PDF is rendered from an image, so its text is not selectable or searchable.
+- Android downloads and native sharing are available inside the APK. Browser versions use the browser's own download/share capabilities.
