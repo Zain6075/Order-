@@ -17,8 +17,8 @@ A simple order-list maker for shop orders. The web app is `index.html`; its font
 A directly installable **debug-signed APK** is built by GitHub Actions. It supports Android 10 (API 29) and newer.
 
 1. Open the [**Build Android APK** workflow](https://github.com/Zain6075/Order-/actions/workflows/android-apk.yml) (or the repository's **Actions** tab). A push to the app branch also starts this workflow automatically.
-2. Open the latest successful run and download the **Saeedi-Essence-Android-debug** artifact.
-3. Unzip the artifact, open `app-debug.apk` on the Android device, and approve Android's “install unknown apps” prompt if shown.
+2. After a successful build, download [`downloads/Saeedi-Essence-Android.apk`](downloads/Saeedi-Essence-Android.apk) directly, or get the **Saeedi-Essence-Android-debug** artifact from the latest run.
+3. Open the APK on the Android device and approve Android's “install unknown apps” prompt if shown.
 
 The APK bundles the app, fonts, and PDF library, so making an order does not require an internet connection. The **Save** button writes PNG/PDF files to `Downloads/Saeedi Essence Orders`; **Share** opens Android's share sheet. Orders are kept in this app's private browser storage and are not shared with the web-browser copy. Uninstalling the app or clearing its app data removes its saved orders.
 

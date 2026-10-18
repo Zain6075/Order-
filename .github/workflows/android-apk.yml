@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - arena/2aff49b3-order
-      - main
     paths:
       - 'android/**'
       - 'index.html'
@@ -14,7 +13,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -54,3 +53,21 @@ jobs:
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30
+
+      - name: Publish APK on the app branch
+        if: github.ref == 'refs/heads/arena/2aff49b3-order'
+        env:
+          APK_SOURCE: android/app/build/outputs/apk/debug/app-debug.apk
+          APK_DESTINATION: downloads/Saeedi-Essence-Android.apk
+        run: |
+          mkdir -p downloads
+          cp "$APK_SOURCE" "$APK_DESTINATION"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f "$APK_DESTINATION"
+          if git diff --cached --quiet; then
+            echo "The APK is unchanged; no commit is needed."
+            exit 0
+          fi
+          git commit -m "Publish Android APK"
+          git push origin "HEAD:refs/heads/${GITHUB_REF_NAME}"
